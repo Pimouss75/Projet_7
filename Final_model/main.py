@@ -16,6 +16,8 @@ app = FastAPI(title='Admissibilité a un pret', version='1.0',
 model = joblib.load("model.pkl")
 
 
+
+
 # This struture will be used for Json validation.
 # With just that Python type declaration, FastAPI will perform below operations on the request data
 ## 1) Read the body of the request as JSON.
@@ -39,9 +41,9 @@ def read_home():
 
 # ML API endpoint for making prediction aganist the request received from client
 @app.post("/predict")
-def predict(data:Data):
-    data = data[data["SK_ID_CURR"] == SK_ID_CURR].drop(['TARGET','SK_ID_CURR'],axis=1).dict()
-#    data = data.drop(['TARGET', 'SK_ID_CURR'],axis=1)
+def predict(client_id:int):
+    data = df[df["SK_ID_CURR"] == client_id].copy()
+    data = data.drop(['TARGET', 'SK_ID_CURR'],axis=1).dict()
     print('mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm',data)
     prediction = model.predict_proba(pd.DataFrame(columns=list(data.keys()), data=[list(data.values())]))
 #    prediction = model.predict(pd.DataFrame(columns=list(data.keys()), data=[list(data.values())]))

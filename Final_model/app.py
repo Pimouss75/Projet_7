@@ -6,13 +6,14 @@ import pandas as pd
 df = pd.read_csv("df_test.csv")
 
 
+
 def run():
     streamlit.title("Prediction d'admissibilité a un pret")
-    SK_ID_CURR = streamlit.number_input("Reference client SK_ID_CURR : ")
+    client_id = streamlit.number_input("Reference client SK_ID_CURR : ")
 
 
     data_pred = {
-        "Reference client SK_ID_CURR : ":SK_ID_CURR,
+        "Reference client SK_ID_CURR : ":client_id,
     }
 
 
