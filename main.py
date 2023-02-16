@@ -14,7 +14,8 @@ app = FastAPI(title='Admissibilité a un pret', version='1.0',
 
 # Initialize model artifacte files. This will be loaded at the start of FastAPI model server.
 model = joblib.load("model.pkl")
-
+explainer = dill.load(open("shap_explainer.dill","rb"))
+df = pd.read_csv("df_test.csv")
 
 
 
@@ -24,8 +25,9 @@ model = joblib.load("model.pkl")
 ## 2) Convert the corresponding types (if needed).
 ## 3) Validate the data.If the data is invalid, it will return a nice and clear error,
 ##    indicating exactly where and what was the incorrect data.
+
 class Data(BaseModel):
-    SK_ID_CURR:int
+    SK_ID_CURR: str
 
 
 
@@ -40,19 +42,19 @@ def read_home():
 
 
 # ML API endpoint for making prediction aganist the request received from client
-@app.post("/predict")
+@app.post("/predict/{client_id}")
 def predict(client_id:int):
-    data = df[df["SK_ID_CURR"] == client_id].copy()
-    data = data.drop(['TARGET', 'SK_ID_CURR'],axis=1).dict()
-    print('mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm',data)
+    data = df[df["SK_ID_CURR"] == client_id].drop(['TARGET', 'SK_ID_CURR'], axis=1).iloc[0].to_dict()
     prediction = model.predict_proba(pd.DataFrame(columns=list(data.keys()), data=[list(data.values())]))
-#    prediction = model.predict(pd.DataFrame(columns=list(data.keys()), data=[list(data.values())]))
-    print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!",prediction)
-    if(prediction[1]>0.54):
-        prediction_solva="Client susceptible d'avoir des difficultées à rembourser un pret."
+    if prediction[0][1] > 0.54:
+        prediction_result = "Client susceptible d'avoir des difficultés à rembourser un prêt."
     else:
-        prediction_solva="Client a faible risque d'etre en defaut de payment si un pret lui est consenti."
-    return prediction_solva
+        prediction_result = "Client à faible risque d'être en défaut de paiement si un prêt lui est consenti."
+
+    # get Shap values from preprocessed data
+        shap_values = explainer.shap_values(data)
+
+    return prediction_result
 
 
 if __name__ == '__main__':

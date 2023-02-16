@@ -3,17 +3,15 @@ import requests as re
 import json
 import pandas as pd
 
-df = pd.read_csv("df_test.csv")
-
-
+# df = pd.read_csv("df_test.csv")
 
 def run():
     streamlit.title("Prediction d'admissibilité a un pret")
-    client_id = streamlit.number_input("Reference client SK_ID_CURR : ")
+    client_id = streamlit.text_input("Reference client SK_ID_CURR : ")
 
 
     data_pred = {
-        "Reference client SK_ID_CURR : ":client_id,
+        "SK_ID_CURR":client_id,
     }
 
 
@@ -23,9 +21,10 @@ def run():
         #response = requests.post("http://127.0.0.1:8000/predict", json=data_pred )
         #prediction = response.text
         #streamlit.success(f"The prediction from model: {prediction}")
-        response = re.post("http://127.0.0.1:8000/predict", data=json.dumps(data_pred, default=str))
+#        response = re.post("http://127.0.0.1:8000/predict", data=json.dumps(data_pred, default=str))
+        response = re.post("http://127.0.0.1:8000/predict/" + str(client_id), data=json.dumps(data_pred, default=str))
         prediction = response.text
-        streamlit.success(f"The prediction from model: {prediction}")
+        streamlit.success(f"La prediction pour ce client est: \n {prediction}")
 
 
 
