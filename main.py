@@ -52,7 +52,8 @@ def predict(client_id:int):
         prediction_result = "Client à faible risque d'être en défaut de paiement si un prêt lui est consenti."
 
     # get Shap values from preprocessed data
-        shap_values = explainer.shap_values(data)
+#    shap_values = explainer.shap_values(list(data.values()))
+#    shap.force_plot(explainer.expected_value[0], shap_values[0], feature_names=data.keys())
 
     return prediction_result
 
