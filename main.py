@@ -14,7 +14,7 @@ app = FastAPI(title='Admissibilité a un pret', version='1.0',
 
 # Initialize model artifacte files. This will be loaded at the start of FastAPI model server.
 model = joblib.load("model.pkl")
-explainer = dill.load(open("shap_explainer.dill","rb"))
+# explainer = dill.load(open("shap_explainer.dill","rb"))
 df = pd.read_csv("df_test.csv")
 
 
