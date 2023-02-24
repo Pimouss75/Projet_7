@@ -22,7 +22,8 @@ def run():
         #prediction = response.text
         #streamlit.success(f"The prediction from model: {prediction}")
 #        response = re.post("http://127.0.0.1:8000/predict", data=json.dumps(data_pred, default=str))
-        response = re.post("http://127.0.0.1:8000/predict/" + str(client_id), data=json.dumps(data_pred, default=str))
+#        response = re.post("http://127.0.0.1:8000/predict/" + str(client_id), data=json.dumps(data_pred, default=str))
+        response = re.post("http://0.0.0.0:8000/predict/" + str(client_id), data=json.dumps(data_pred, default=str))
         prediction = response.text
         streamlit.success(f"La prediction pour ce client est: \n {prediction}")
 
