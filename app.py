@@ -7,8 +7,15 @@ import shap
 import streamlit_shap
 st.set_page_config(layout='wide')
 
+<<<<<<< Updated upstream
 st.set_option('deprecation.showPyplotGlobalUse', False)
 url_aws = "http://127.0.0.1:8000"
+=======
+st.set_page_config(layout="wide")
+st.set_option('deprecation.showPyplotGlobalUse', False)
+aws_add = "http://127.0.0.1:8000"
+
+>>>>>>> Stashed changes
 button_style = """
         <style>
         .stButton > button {
@@ -16,6 +23,7 @@ button_style = """
             background: black;
             width: 150px;
             height: 80px;
+<<<<<<< Updated upstream
                         
         }
         button{
@@ -47,12 +55,35 @@ def run():
         prediction = response.text
         st.success(f"La prediction pour ce client est: \n {prediction}")
 
+=======
+            font-size:20px;
+        }
+        </style>
+        """
+
+st.markdown(button_style, unsafe_allow_html=True)
+
+def run():
+    st.title("Prediction d'admissibilité a un pret")
+    client_id = st.text_input("Reference client (SK_ID_CURR) : ", max_chars = 6)
+
+    if st.button("Predict"):
+#        st.info(client_id)
+        if client_id == "" :
+            prediction = "Merci de fournir une reference client"
+            st.success(f"La prediction pour ce client est: \n {prediction}")
+        else :
+            response = requests.post(f"{aws_add}/predict/" + str(client_id), data=json.dumps(client_id, default=str))
+            prediction = response.text
+            st.success(f"La prediction pour ce client est: \n {prediction}")
+
+>>>>>>> Stashed changes
     if st.sidebar.button("Features importance"):
 
         # Chargement du de l'explainer
         explainer = dill.load(open("shap_explainer.dill", "rb"))
 
-        response = requests.get(f"{url_aws}/client/" + str(client_id),verify=False)
+        response = requests.get(f"{aws_add}/client/" + str(client_id),verify=False)
         if response.status_code == 200:
             X_test = response.json()["data"]
 #            X_test = pd.DataFrame(X_test)
@@ -64,12 +95,12 @@ def run():
             st.subheader("Interprétabilité shap du client")
             # Affichage du graphique
 
-            streamlit_shap.st_shap(shap.force_plot(explainer.expected_value[0],
+            streamlit_shap.st_shap(shap.force_plot(explainer.expected_value[1],
                                                    shap_values[0][1],
                                                    feature_names=X_test.columns))
 
 
-            shap.plots._waterfall.waterfall_legacy(explainer.expected_value[0],
+            shap.plots._waterfall.waterfall_legacy(explainer.expected_value[1],
                                                    shap_values[0][1],
                                                    feature_names=X_test.columns,
                                                    max_display=10)
