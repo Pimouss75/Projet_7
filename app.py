@@ -1,30 +1,53 @@
-import streamlit
+import streamlit as st
 import requests
 import json
 import pandas as pd
 import dill
 import shap
 import streamlit_shap
+st.set_page_config(layout='wide')
 
-streamlit.set_option('deprecation.showPyplotGlobalUse', False)
+st.set_option('deprecation.showPyplotGlobalUse', False)
 url_aws = "http://127.0.0.1:8000"
-
-def run():
-    streamlit.title("Prediction d'admissibilité a un pret")
-    client_id = streamlit.text_input("Reference client SK_ID_CURR : ")
-
-    data_pred = {
-        "SK_ID_CURR":client_id,
+button_style = """
+        <style>
+        .stButton > button {
+            color: white;
+            background: black;
+            width: 150px;
+            height: 80px;
+                        
+        }
+        button{
+   div{
+    p{font-size:50px}
     }
+        </style>
+        """
 
-    if streamlit.button("Predict"):
-        streamlit.info(data_pred)
 
-        response = requests.post(f"{url_aws}/predict/" + str(client_id), data=json.dumps(data_pred, default=str))
+
+st.markdown(button_style, unsafe_allow_html=True)
+def run():
+    st.title("Prediction d'admissibilité a un pret")
+    client_id = st.text_input("Reference client SK_ID_CURR : ",max_chars = 6 )
+
+#    data_pred = {
+#        "SK_ID_CURR":client_id,
+#    }
+
+    if st.button("Predict"):
+#        st.info(data_pred)
+        if client_id == "":
+            response = "Merci de donner un numero client"
+            st.success( {response} )
+
+
+        response = requests.post(f"{url_aws}/predict/" + str(client_id), data=json.dumps(client_id, default=str))
         prediction = response.text
-        streamlit.success(f"La prediction pour ce client est: \n {prediction}")
+        st.success(f"La prediction pour ce client est: \n {prediction}")
 
-    if streamlit.sidebar.button("Features importance"):
+    if st.sidebar.button("Features importance"):
 
         # Chargement du de l'explainer
         explainer = dill.load(open("shap_explainer.dill", "rb"))
@@ -38,7 +61,7 @@ def run():
             shap_values = explainer.shap_values(X_test)
 
 
-            streamlit.subheader("Interprétabilité shap du client")
+            st.subheader("Interprétabilité shap du client")
             # Affichage du graphique
 
             streamlit_shap.st_shap(shap.force_plot(explainer.expected_value[0],
@@ -50,7 +73,7 @@ def run():
                                                    shap_values[0][1],
                                                    feature_names=X_test.columns,
                                                    max_display=10)
-            streamlit.pyplot()
+            st.pyplot()
 
 
 

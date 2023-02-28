@@ -16,11 +16,11 @@ app = FastAPI(title='Admissibilité à un prêt', version='1.0',
 # Chargement des fichiers d'artefacts de modèle au lancement du serveur FastAPI
 model = joblib.load("model.pkl")
 df = pd.read_csv("df_test.csv")
-df_selected = df.drop(['TARGET', 'SK_ID_CURR'], axis=1)
+# df_selected = df.drop(['TARGET', 'SK_ID_CURR'], axis=1)
 
 # Définition d'une classe Pydantic pour valider la requête
-class Data(BaseModel):
-    SK_ID_CURR: str
+#class Data(BaseModel):
+#    SK_ID_CURR: str
 
 
 
@@ -40,7 +40,8 @@ def predict(client_id: str):
     client_id = str(client_id)
     data = df[df["SK_ID_CURR"] == client_id].drop(['TARGET', 'SK_ID_CURR'], axis=1)
     if len(data) == 0:
-        raise HTTPException(status_code=404, detail=f"Client {client_id} non référencé, prédiction impossible.")
+        prediction_result = "Numero client invalide."
+        return prediction_result
     else:
         # Seuil optimal
         seuil = 0.54
