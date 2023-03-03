@@ -37,6 +37,7 @@ def predict(prediction_data: PredictionData, client_id: str):
     df.SK_ID_CURR = df.SK_ID_CURR.astype('str')
     client_id = str(client_id)
     data = df[df["SK_ID_CURR"] == client_id].drop(['TARGET', 'SK_ID_CURR'], axis=1)
+
     if len(data) == 0:
         prediction_result = "Numero client invalide."
         return prediction_result
@@ -53,16 +54,28 @@ def predict(prediction_data: PredictionData, client_id: str):
 
 # Point de terminaison pour obtenir les données d'un client en fonction de son ID
 @app.get("/client/{client_id}")
-def get_client(client_id: str) -> dict:
+def get_client(client_id: str) :
     df.SK_ID_CURR = df.SK_ID_CURR.astype('str')
     client_id = str(client_id)
     data = df[df["SK_ID_CURR"] == client_id].drop(['TARGET', 'SK_ID_CURR'], axis=1)
+
     if len(data) == 0:
         raise HTTPException(status_code=404, detail=f"Client {client_id} non référencé.")
     else:
         data = data.to_dict(orient="records")[0]
         return {"data": data}
 
+
+@app.get("/all_X_test")
+def all_X_test() :
+    data1 = df.drop(['TARGET', 'SK_ID_CURR'], axis=1)
+    # apply the preprocessing to x_test
+#    data3 = model['preprocessors'].transform(data1)
+#    data3 = pd.DataFrame(data3, index=data1.index, columns=data1.columns)
+#    del data1
+    data2 = data1.to_dict(orient="records")[0]
+#    del data3
+    return {"data2": data2}
 
 if __name__ == '__main__':
     uvicorn.run("main:app", host="localhost", port=80, reload=True)

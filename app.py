@@ -46,7 +46,7 @@ def run():
             "SK_ID_CURR":client_id,
         }
 
-    col1, col2, col3 = st.columns([20, 20, 50])
+    col1, col2, col3 = st.columns([20, 20, 20])
 
     def la_rep():
 
@@ -64,7 +64,44 @@ def run():
 #       st.info(data_pred)
         la_rep()
 
-    if col2.button("Features importance"):
+
+    if col3.button("Comparaison avec les autres clients"):
+        la_rep()
+        explainer = dill.load(open("shap_explainer.dill", "rb"))
+        response2 = requests.get(f"{loc_aws}/client/" + str(client_id), verify=False)
+
+        if response2.status_code == 200:
+            response = requests.get(f"{loc_aws}/all_X_test", verify=False)
+            X_test_all = response.json()["data2"]
+            X_test_all = pd.DataFrame(X_test_all, index=pd.RangeIndex(len(X_test_all)))
+
+            shap_values = explainer.shap_values(X_test_all)
+            st.set_option('deprecation.showPyplotGlobalUse', False)
+
+            st.subheader("Interprétabilité globale")
+            shap.summary_plot(shap_values, X_test_all, feature_names=X_test_all.columns)
+            st.pyplot()
+
+
+            X_test = response2.json()["data"]
+            # X_test = pd.DataFrame(X_test)
+            X_test = pd.DataFrame(X_test, index=pd.RangeIndex(len(X_test)))
+
+            shap_values = explainer.shap_values(X_test)
+
+            # Affichage du graphique
+            st.subheader(f"Interprétabilité locale du client {client_id}")
+            streamlit_shap.st_shap(shap.force_plot(explainer.expected_value[1],
+                                                   shap_values[0][1],
+                                                   feature_names=X_test.columns))
+
+            st.pyplot()
+
+
+
+
+
+    if col2.button("Interpretation du client"):
         la_rep()
 
         # Chargement du de l'explainer
@@ -78,18 +115,23 @@ def run():
 
             shap_values = explainer.shap_values(X_test)
 
-            st.subheader("Interprétabilité shap du client")
+#            st.subheader("Interprétabilité shap du client")
             # Affichage du graphique
-
-            streamlit_shap.st_shap(shap.force_plot(explainer.expected_value[0],
+            st.subheader(f"Interprétabilité locale du client {client_id}")
+            streamlit_shap.st_shap(shap.force_plot(explainer.expected_value[1],
                                                    shap_values[0][1],
                                                    feature_names=X_test.columns))
 
-            shap.plots._waterfall.waterfall_legacy(explainer.expected_value[0],
+
+            shap.plots._waterfall.waterfall_legacy(explainer.expected_value[1],
                                                    shap_values[0][1],
                                                    feature_names=X_test.columns,
                                                    max_display=10)
             st.pyplot()
+
+
+
+
 
 
 if __name__ == '__main__':
