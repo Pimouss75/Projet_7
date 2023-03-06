@@ -1,0 +1,66 @@
+name: CI-CD pipeline
+
+on:
+  push:
+    branches:
+      - dev
+
+jobs:
+  test_and_deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout source code
+      uses: actions/checkout@v2
+      with:
+        ref: dev
+
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.x
+
+    - name: Install dependencies
+      run: pip install -r requirements.txt
+
+    - name: Run tests
+      run: pytest test_cases/test_user.py
+
+    - name: Deploy to AWS EC2
+      if: success()
+      uses: easingthemes/ssh-deploy@v2.1.4
+      with:
+        ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+        remote_host: ${{ secrets.REMOTE_HOST }}
+        remote_user: ${{ secrets.REMOTE_USER }}
+        local_path: .
+        remote_path: /var/www/projet_7
+        args: --exclude=".git/*"
+
+    - name: Start the application
+      if: success()
+      run: |
+        ssh -i ${{ secrets.SSH_PRIVATE_KEY }} ${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }} '
+          cd /var/www/projet_7
+          sudo apt-get update
+          sudo apt install python3-pip -y
+          pip3 install -r requirements.txt --no-cache-dir
+          sudo apt-get install ipython3 -y
+          pip3 install streamlit --upgrade
+          pip3 install streamlit_shap
+          nohup uvicorn main:app --host 0.0.0.0 --port 80 &>/dev/null &'
+
+    - name: Update main branch
+      if: success()
+      run: |
+        git config --global user.email "${{ secrets.marcsellam@gmail.com }}"
+        git config --global user.name "${{ secrets.Pimouss75 }}"
+        git checkout main
+        git pull origin main
+        git merge dev
+        git push origin main
+
+    - name: Notify on failure
+      if: failure()
+      run: |
+        echo "Tests failed! Please fix the issues and try again."

@@ -45,10 +45,14 @@ def predict(prediction_data: PredictionData, client_id: str):
         # Seuil optimal
         seuil = 0.50
         prediction = model.predict_proba(data)
-        if prediction[0][1] > seuil:
-            prediction_result = "Client susceptible d'avoir des difficultés à rembourser un prêt."
+        proba_c = prediction[0][1]
+        proba_c =round(proba_c, 3)
+        if proba_c > seuil:
+            prediction_result = f"Client susceptible d'avoir des difficultés à rembourser un prêt " \
+                                f"(probabilité d'etre en défaut = {proba_c}, seuil = {seuil})."
         else:
-            prediction_result = "Client à faible risque d'être en défaut de paiement si un prêt lui est consenti."
+            prediction_result = f"Client à faible risque d'être en défaut de paiement si un prêt lui est consenti " \
+                                f"(probabilité d'etre en défaut = {proba_c}, seuil = {seuil})."
         return prediction_result
 
 
@@ -62,19 +66,39 @@ def get_client(client_id: str) :
     if len(data) == 0:
         raise HTTPException(status_code=404, detail=f"Client {client_id} non référencé.")
     else:
-        data = data.to_dict(orient="records")[0]
+        data3 = model['preprocessors'].transform(data)
+        data3 = pd.DataFrame(data3, index=data.index, columns=data.columns)
+        del data
+        data = data3.to_dict(orient="records")
         return {"data": data}
 
+@app.get("/client2/{client_id}")
+def get_client(client_id: str) :
+    df.SK_ID_CURR = df.SK_ID_CURR.astype('str')
+    client_id = str(client_id)
+    data = df[df["SK_ID_CURR"] == client_id].drop(['TARGET', 'SK_ID_CURR'], axis=1)
+#    data[data.select_dtypes(include=['float']).columns] = data.select_dtypes(include=['float']).astype('float32')
+    data['CODE_GENDER'] = data['CODE_GENDER'].astype(int)
+    data['CODE_GENDER'] = data['CODE_GENDER'].apply(lambda x: 'F' if x == 1 else 'M')
 
+    if len(data) == 0:
+        raise HTTPException(status_code=404, detail=f"Client {client_id} non référencé.")
+    else:
+        data = data.fillna('?')
+        data = data.to_dict(orient="records")
+
+        return {"data": data}
+
+# Point de terminaison pour obtenir les données relatives a tous les clients test
 @app.get("/all_X_test")
 def all_X_test() :
     data1 = df.drop(['TARGET', 'SK_ID_CURR'], axis=1)
     # apply the preprocessing to x_test
-#    data3 = model['preprocessors'].transform(data1)
-#    data3 = pd.DataFrame(data3, index=data1.index, columns=data1.columns)
-#    del data1
-    data2 = data1.to_dict(orient="records")[0]
-#    del data3
+    data3 = model['preprocessors'].transform(data1)
+    data3 = pd.DataFrame(data3, index=data1.index, columns=data1.columns)
+    del data1
+    data2 = data3.to_dict(orient="records")
+    del data3
     return {"data2": data2}
 
 if __name__ == '__main__':
