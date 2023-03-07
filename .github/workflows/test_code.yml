@@ -2,8 +2,9 @@ name: CI-CD pipeline
 
 on:
   push:
-    branches:
-      - dev
+    branches: [dev]
+#    branches:
+#      - dev
 
 jobs:
   test_and_deploy:
@@ -12,8 +13,8 @@ jobs:
     steps:
     - name: Checkout source code
       uses: actions/checkout@v3
-      with:
-        ref: dev
+#      with:
+#        ref: dev
 
     - name: Set up Python
       uses: actions/setup-python@v3
@@ -35,15 +36,18 @@ jobs:
       run: |
         git config --global user.email "${{ secrets.MARCUSS_EMAIL }}"
         git config --global user.name "${{ secrets.MARCUSS_USERNAME }}"
-        git remote remove origin
-        git remote add origin https://github.com/Pimouss75/Projet_7.git
-        git branch -M main
-        git fetch
-        git checkout dev
-        git fetch
+#        git remote remove origin
+#        git remote add origin https://github.com/Pimouss75/Projet_7.git
+#        git branch -M main
+#        git fetch
+#        git checkout dev
+#        git fetch
+#        git checkout main
+#        git fetch
+#        git merge dev
         git checkout main
-        git fetch
         git merge dev
+        git push origin main
 
     - name: Configure AWS EC2
       if: success()
