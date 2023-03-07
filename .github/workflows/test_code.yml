@@ -54,18 +54,18 @@ jobs:
         REMOTE_HOST: ${{ secrets.REMOTE_HOST }}
         REMOTE_USER: ${{ secrets.REMOTE_USER }}
 
-    - name: Deploy to AWS EC2
-      if: success()
-      run: |
-          git clone https://github.com/Pimouss75/Projet_7.git
-          cd Projet_7
-          sudo apt-get update
-          sudo apt install python3-pip -y
-          pip3 install -r requirements.txt --no-cache-dir
-          sudo apt-get install ipython3 -y
-          pip3 install streamlit --upgrade
-          pip3 install streamlit_shap
-          nohup uvicorn main:app --host 0.0.0.0 --port 80 &>/dev/null &
+#    - name: Deploy to AWS EC2
+#      if: success()
+#      run: |
+#          git clone https://github.com/Pimouss75/Projet_7.git
+#          cd Projet_7
+#          sudo apt-get update
+#          sudo apt install python3-pip -y
+#          pip3 install -r requirements.txt --no-cache-dir
+#          sudo apt-get install ipython3 -y
+#          pip3 install streamlit --upgrade
+#          pip3 install streamlit_shap
+#          nohup uvicorn main:app --host 0.0.0.0 --port 80 &>/dev/null &
 
 
     - name: Notify on failure
