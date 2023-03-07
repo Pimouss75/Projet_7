@@ -39,11 +39,11 @@ jobs:
         git remote add origin https://github.com/Pimouss75/Projet_7.git
         git branch -M main
         git fetch
-        git checkout main
-        git fetch
         git checkout dev
         git fetch
-        git merge main
+        git checkout main
+        git fetch
+        git merge dev
 
     - name: Configure AWS EC2
       if: success()
