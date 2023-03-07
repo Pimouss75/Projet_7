@@ -46,13 +46,16 @@ jobs:
         git fetch
         git merge main
 
-    - name: Deploy to AWS EC2
+    - name: Configure AWS EC2
       if: success()
       uses: easingthemes/ssh-deploy@main
       env:
         SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
         REMOTE_HOST: ${{ secrets.REMOTE_HOST }}
         REMOTE_USER: ${{ secrets.REMOTE_USER }}
+
+    - name: Deploy to AWS EC2
+      if: success()
       run: |
           git clone https://github.com/Pimouss75/Projet_7.git
           cd Projet_7
