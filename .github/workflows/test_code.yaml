@@ -1,6 +1,6 @@
 name: CI-CD pipeline
 
-SSH_PRIVATE_KEY = my_key.pem
+SSH_PRIVATE_KEY = "my_key.pem"
 REMOTE_HOST = ec2-52-47-135-193.eu-west-3.compute.amazonaws.com
 REMOTE_USER = ubuntu
 
@@ -39,9 +39,9 @@ jobs:
       if: success()
       uses: easingthemes/ssh-deploy@v2.1.4
       with:
-        ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
-        remote_host: ${{ secrets.REMOTE_HOST }}
-        remote_user: ${{ secrets.REMOTE_USER }}
+        SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+        REMOTE_HOST: ${{ secrets.REMOTE_HOST }}
+        REMOTE_USER: ${{ secrets.REMOTE_USER }}
         local_path: .
         remote_path: /var/www/projet_7
         args: --exclude=".git/*"
