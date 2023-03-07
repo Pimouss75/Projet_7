@@ -35,24 +35,11 @@ jobs:
       run: |
         git config --global user.email "${{ secrets.MARCUSS_EMAIL }}"
         git config --global user.name "${{ secrets.MARCUSS_USERNAME }}"
-<<<<<<< HEAD
-        git remote remove origin
-        git remote add origin https://github.com/Pimouss75/Projet_7.git
-        git branch -M main
-        git fetch
-        git checkout dev
-        git fetch
-        git checkout main
-        git fetch
-        git merge dev
-=======
         git fetch
         git remote update
         git checkout main
         git merge --allow-unrelated-histories dev
         git push origin main
-
->>>>>>> fe9b6a5f82643065e49456a38ccc10c7a34559e7
     - name: Configure AWS EC2
       if: success()
       uses: easingthemes/ssh-deploy@main
