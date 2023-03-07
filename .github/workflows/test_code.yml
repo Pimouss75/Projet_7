@@ -62,7 +62,7 @@ jobs:
           sudo apt-get install ipython3 -y
           pip3 install streamlit --upgrade
           pip3 install streamlit_shap
-          nohup uvicorn main:app --host 0.0.0.0 --port 80 &>/dev/null &'
+          nohup uvicorn main:app --host 0.0.0.0 --port 80 &>/dev/null &
 
 
     - name: Notify on failure
