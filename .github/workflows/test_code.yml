@@ -38,18 +38,18 @@ jobs:
         git remote remove origin
         git remote add origin https://github.com/Pimouss75/Projet_7.git
         git branch -M main
-        git checkout main
-        git fetch
         git checkout dev
         git fetch
         git checkout main
         git fetch
-        git merge dev
+        git checkout dev
+        git fetch
+        git merge main
 
     - name: Deploy to AWS EC2
       if: success()
       run: |
-        ssh -i "my_key.pem" ubuntu@ec2-52-47-135-193.eu-west-3.compute.amazonaws.com
+        ssh -i "${{ secrets.SSH_PRIVATE_KEY }}" ubuntu@ec2-52-47-135-193.eu-west-3.compute.amazonaws.com
           git clone https://github.com/Pimouss75/Projet_7.git
           cd Projet_7
           sudo apt-get update
