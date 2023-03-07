@@ -30,30 +30,6 @@ jobs:
     - name: Run tests
       run: pytest test_cases/test_user.py
 
-    - name: Deploy to AWS EC2
-      if: success()
-      uses: easingthemes/ssh-deploy@v2.1.4
-      with:
-        SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-        REMOTE_HOST: ${{ secrets.REMOTE_HOST }}
-        REMOTE_USER: ${{ secrets.REMOTE_USER }}
-        local_path: .
-        remote_path: /var/www/projet_7
-        args: --exclude=".git/*"
-
-    - name: Start the application
-      if: success()
-      run: |
-        ssh -i ${{ secrets.SSH_PRIVATE_KEY }} ${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }} '
-          cd /var/www/projet_7
-          sudo apt-get update
-          sudo apt install python3-pip -y
-          pip3 install -r requirements.txt --no-cache-dir
-          sudo apt-get install ipython3 -y
-          pip3 install streamlit --upgrade
-          pip3 install streamlit_shap
-          nohup uvicorn main:app --host 0.0.0.0 --port 80 &>/dev/null &'
-
     - name: Update main branch
       if: success()
       run: |
@@ -63,6 +39,22 @@ jobs:
         git pull origin main
         git merge dev
         git push origin main
+
+
+    - name: Deploy to AWS EC2
+      if: success()
+      run: |
+        ssh -i "my_key.pem" ubuntu@ec2-52-47-135-193.eu-west-3.compute.amazonaws.com
+          git clone https://github.com/Pimouss75/Projet_7.git
+          cd Projet_7
+          sudo apt-get update
+          sudo apt install python3-pip -y
+          pip3 install -r requirements.txt --no-cache-dir
+          sudo apt-get install ipython3 -y
+          pip3 install streamlit --upgrade
+          pip3 install streamlit_shap
+          nohup uvicorn main:app --host 0.0.0.0 --port 80 &>/dev/null &'
+
 
     - name: Notify on failure
       if: failure()
