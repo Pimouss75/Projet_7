@@ -38,8 +38,8 @@ jobs:
         git config --global user.name "${{ secrets.MARCUSS_USERNAME }}"
         git remote remove origin
         git remote add origin https://github.com/Pimouss75/Projet_7.git
-        git branch -M main
-        git fetch
+#        git branch -M main
+#        git fetch
         git checkout main
         git fetch
         git checkout dev
