@@ -1,0 +1,71 @@
+name: CI-CD pipeline
+
+on:
+  push:
+    branches:
+      - dev
+
+jobs:
+  test_and_deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout source code
+      uses: actions/checkout@v3
+      with:
+        ref: dev
+
+    - name: Set up Python
+      uses: actions/setup-python@v3
+      with:
+        python-version: 3.10.6
+
+    - name: Install dependencies
+      run: pip install -r requirements.txt
+
+    - name: Install pytest
+      run: |
+        pip install pytest
+    - name: Run tests
+      run: pytest test_cases/test_user.py
+
+    - name: Update main branch
+      if: success()
+      run: |
+        git config --global user.email "${{ secrets.MARCUSS_EMAIL }}"
+        git config --global user.name "${{ secrets.MARCUSS_USERNAME }}"
+        git remote remove origin
+        git remote add origin https://github.com/Pimouss75/Projet_7.git
+        git branch -M main
+        git fetch
+        git checkout dev
+        git fetch
+        git checkout main
+        git fetch
+        git merge dev
+    - name: Configure AWS EC2
+      if: success()
+      uses: easingthemes/ssh-deploy@main
+      env:
+        SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+        REMOTE_HOST: ${{ secrets.REMOTE_HOST }}
+        REMOTE_USER: ${{ secrets.REMOTE_USER }}
+
+#    - name: Deploy to AWS EC2
+#      if: success()
+#      run: |
+#          git clone https://github.com/Pimouss75/Projet_7.git
+#          cd Projet_7
+#          sudo apt-get update
+#          sudo apt install python3-pip -y
+#          pip3 install -r requirements.txt --no-cache-dir
+#          sudo apt-get install ipython3 -y
+#          pip3 install streamlit --upgrade
+#          pip3 install streamlit_shap
+#          nohup uvicorn main:app --host 0.0.0.0 --port 80 &>/dev/null &
+
+
+    - name: Notify on failure
+      if: failure()
+      run: |
+        echo "Tests failed! Please fix the issues and try again."
