@@ -39,7 +39,7 @@ jobs:
         git fetch
         git remote update
         git checkout main
-        git merge dev
+        git merge --allow-unrelated-histories dev
         git push origin main
 
     - name: Configure AWS EC2
