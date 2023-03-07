@@ -38,7 +38,7 @@ jobs:
         git remote remove origin
         git remote add origin https://github.com/Pimouss75/Projet_7.git
         git branch -M main
-        git checkout dev
+#        git checkout dev
         git fetch
         git checkout main
         git fetch
