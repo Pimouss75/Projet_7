@@ -30,7 +30,6 @@ jobs:
     - name: Run tests
       run: pytest test_cases/test_user.py
 
-
     - name: Update main branch
       if: success()
       run: |
@@ -39,7 +38,7 @@ jobs:
         git remote remove origin
         git remote add origin https://github.com/Pimouss75/Projet_7.git
 #        git branch -M main
-#        git fetch
+        git fetch
         git checkout main
         git fetch
         git checkout dev
