@@ -36,13 +36,24 @@ jobs:
       run: |
         git config --global user.email "${{ secrets.MARCUSS_EMAIL }}"
         git config --global user.name "${{ secrets.MARCUSS_USERNAME }}"
+        git remote remove origin
+        git remote add origin https://github.com/Pimouss75/Projet_7.git
+        git branch -M main
+        git fetch
         git checkout main
-        git merge dev
+        git fetch
+        git checkout dev
+        git fetch
+        git merge main
 
     - name: Deploy to AWS EC2
       if: success()
+      uses: easingthemes/ssh-deploy@main
+      env:
+        SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+        REMOTE_HOST: ${{ secrets.REMOTE_HOST }}
+        REMOTE_USER: ${{ secrets.REMOTE_USER }}
       run: |
-        ssh -i "${{ secrets.SSH_PRIVATE_KEY }}" ubuntu@ec2-52-47-135-193.eu-west-3.compute.amazonaws.com
           git clone https://github.com/Pimouss75/Projet_7.git
           cd Projet_7
           sudo apt-get update
