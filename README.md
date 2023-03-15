@@ -21,7 +21,7 @@
 #### -df_train_test.csv : dataset composé d'une dizaine  d’observations du dataset d’entrainement.
 #### -model.pkl : model de prediction
 #### -test_user.py : code de test pytest
-#### -pics : captures ecrans d'images du notebook.
+#### -DOSSIER pics : captures ecrans d'images du notebook.
 
 
 # 1
