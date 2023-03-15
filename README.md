@@ -4,7 +4,7 @@
 #### -Lorsque la case « Prediction » aura été cliquée, la réponse à la demande de crédit s’affiche ainsi que l’explication et la valeur de chaque variable dont la description est disponible.
 #### -Lorsque la case « Interpretation du client » est cliquée, la réponse à la demande de crédit s’affiche ainsi que la feature importance locale sous forme de graphique est générée en utilisant SHAP.
 #### -Lorsque la case « Comparaison avec les autres clients » est cliquée, la réponse à la demande de crédit s’affiche ainsi que la feature importance locale sous forme de graphique est générée en utilisant SHAP ainsi que l’importances des variables pour tous les clients de test (globale), soit la globalité des clients (graphique des variables qui influencent tous les clients test par ordre decroissants).
-### Le contenu de ce repository est composé des elements nécessaires au deploiement, dont voici le detail:
+### Le contenu de ce repository est composé, entre autres, des éléments nécessaires au deploiement, dont voici le detail:
 #### -P7_Marc_Sellam.ipynb : Le notebook qui a servi à l'elaboration du model de prediction qui va etre deployé.
 #### -DOSSIER mlflow_model : Dossier généré par MLFLOW contenant des elements nécessaires au deploiement du model(requirements/model).
 #### -model.pkl : modele au format pickle généré par le notebook (egalement par mlflow).
