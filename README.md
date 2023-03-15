@@ -13,15 +13,15 @@
 #### -app.py : application Dashboard (app.py) réalisée avec Streamlit qui fait appelle à l’API via une url pour récupérer la réponse à la demande de crédit, récupérer les variables et leurs valeurs respectives client afin de les décrire sous forme d’un tableau et afficher le graphique des features importances du client avec SHAP (locale) ou récupérer les variables de tous les clients de test afin d’en afficher le graphique d’importance des features sur tous les clients (globale).
 #### -main.py : API (main.py) réalisée avec Fastapi, qui renverra les informations décrites ci-dessus sur demande de Streamlit (calcul de la prédiction du client, variables du clients et variables de tous les clients).
 #### -df_test.csv : dataset de test composé des clients de test.
-#### -pad.png : Logo "pret a depenser" utilisé lors de l'affichage du dashboard
-#### -app_test_global.png : graphique des features importance de tous les clients (globale)
+#### -pad.png : Logo "pret a depenser" utilisé lors de l'affichage du dashboard.
+#### -app_test_global.png : graphique des features importance de tous les clients (globale).
 #### -report_data_drift.html : Rapport d’analyse au format HTML crée par la librairie Evidently ,décrit les résultats de l'analyse de dérive de données pour un ensemble de données contenant 20 caractéristiques. 
-#### -DOSSIER .github/workflows : contient le fichier test_code.yml, fichier de parametrage GitHub Actions nécessaire pour un déploiement automatisé. 
+#### -DOSSIER .github/workflows : contient le fichier test_code.yml, fichier de parametrage GitHub Actions nécessaire pour un déploiement automatisé.
+#### -DOSSIER pics : captures ecrans d'images du notebook.
 #### -DOSSIER test_cases : dossier de test pytest contenant les element necessaires a son fonctionement afin que GitHub Actions effectue un déploiement automatisé si ce test est validé, soit :
 #### -df_train_test.csv : dataset composé d'une dizaine  d’observations du dataset d’entrainement.
 #### -model.pkl : model de prediction
 #### -test_user.py : code de test pytest
-#### -DOSSIER pics : captures ecrans d'images du notebook.
 
 
 # 1
