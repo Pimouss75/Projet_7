@@ -81,7 +81,7 @@ def run():
     if col1.button("Prediction"):
         la_rep()
 
-        response2 = requests.get(f"{loc_aws}/client2/" + str(client_id), verify=False)
+        response2 = requests.get(f"{loc_aws}/client2/{client_id}" , verify=False)
         if response2.status_code == 200:
             st.subheader(f"Informations relatives au client {client_id}")
             X_test = response2.json()["data"]
@@ -93,6 +93,10 @@ def run():
                 index={'DAYS_BIRTH': 'Age', 'CODE_GENDER': 'SEXE', 'DAYS_EMPLOYED': 'YEARS_EMPLOYED'})
 #            columns = info_df.index.tolist()
             st.dataframe(info_df)
+
+        else:
+            st.write("echec de la requete", response2.status_code)
+
 
     if col3.button("Comparaison avec les autres clients"):
         la_rep()
@@ -151,16 +155,12 @@ def run():
 
 
     st.sidebar.header("Choix de la variable à afficher")
-    # liste déroulante des variables
-    #    nom_colonnes = requests.get(f"{url_aws}/columns", verify=False)
+    # liste déroulante variables
 
     nom_colonnes = ['REG_CITY_NOT_WORK_CITY', 'REGION_RATING_CLIENT', 'DAYS_ID_PUBLISH',
                      'Age', 'SEXE', 'REG_CITY_NOT_LIVE_CITY', 'DAYS_LAST_PHONE_CHANGE',
                     'EXT_SOURCE_2', 'YEARS_EMPLOYED', 'EXT_SOURCE_3']
 
-#    nom_colonnes = ['DAYS_ID_PUBLISH',
-#                            'Age',
-#                            'EXT_SOURCE_2', 'YEARS_EMPLOYED', 'EXT_SOURCE_3']
 
     column_sel = nom_colonnes[0]
     nom_colonnes = pd.Series(nom_colonnes)
@@ -168,11 +168,11 @@ def run():
     column_sel = st.sidebar.selectbox('Sélectionnez la variable :', options=nom_colonnes)
     # les donnes des clients du dataset de cette colonne
 
-    response4 = requests.get(f"{loc_aws}/col_choix/" + str(column_sel), verify=False)
-    response2 = requests.get(f"{loc_aws}/client2/" + str(client_id), verify=False)
+    response4 = requests.get(f"{loc_aws}/col_choix/{column_sel}", verify=False)
+    response2 = requests.get(f"{loc_aws}/client2/{client_id}" , verify=False)
 
 #    val_cli = None
-    if response2.status_code == 200:
+    if response2.status_code == 200 and response4.status_code == 200:
         X_test2 = response2.json()["data"]
         X_test2 = pd.DataFrame(X_test2)
         X_test2 = X_test2.replace('?', np.nan)

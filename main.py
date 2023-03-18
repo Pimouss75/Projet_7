@@ -16,7 +16,7 @@ app = FastAPI(title='Admissibilité à un prêt', version='1.0',
 # Chargement des fichiers d'artefacts de modèle au lancement du serveur FastAPI
 model = joblib.load("model.pkl")
 df = pd.read_csv("df_test.csv")
-df['TARGET'] = model.predict(df.drop(['TARGET', 'SK_ID_CURR'], axis=1))
+# df['TARGET'] = model.predict(df.drop(['TARGET', 'SK_ID_CURR'], axis=1))
 
 
 # Définition d'une classe Pydantic pour valider la requête
@@ -120,6 +120,6 @@ def col_choix(column_sel: str) :
 
 
 if __name__ == '__main__':
-    uvicorn.run("main:app", host="localhost", port=80, reload=True)
+    uvicorn.run("main:app", host="localhost", port=8000, reload=True)
 
 # lancer l'api: uvicorn main:app --reload
