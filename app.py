@@ -5,7 +5,11 @@ import pandas as pd
 import dill
 import shap
 import streamlit_shap
+import numpy as np
+from streamlit_plotly_events import plotly_events
+import plotly.express as px
 import base64
+
 
 st.set_page_config(layout='wide',page_title='Prêt à dépenser')
 st.set_option('deprecation.showPyplotGlobalUse', False)
@@ -82,16 +86,13 @@ def run():
             st.subheader(f"Informations relatives au client {client_id}")
             X_test = response2.json()["data"]
             X_test = pd.DataFrame(X_test)
-#            X_test = pd.DataFrame(X_test, index=pd.RangeIndex(len(X_test))).iloc[0, :]
-            X_test['DAYS_BIRTH'] = round(-X_test['DAYS_BIRTH'] / 365, 1)
-            X_test['DAYS_EMPLOYED'] = round(-X_test['DAYS_EMPLOYED'] / 365, 1)
             info_df = pd.concat([pd.DataFrame(descr_var).set_index('Information'),
                        X_test.T], axis=1, join="inner")
             info_df = info_df.rename(columns={0 : 'Valeur'})
             info_df = info_df.rename(
                 index={'DAYS_BIRTH': 'Age', 'CODE_GENDER': 'SEXE', 'DAYS_EMPLOYED': 'YEARS_EMPLOYED'})
+#            columns = info_df.index.tolist()
             st.dataframe(info_df)
-
 
     if col3.button("Comparaison avec les autres clients"):
         la_rep()
@@ -148,6 +149,71 @@ def run():
             st.pyplot()
 
 
+
+    st.sidebar.header("Choix de la variable à afficher")
+    # liste déroulante des variables
+    #    nom_colonnes = requests.get(f"{url_aws}/columns", verify=False)
+
+    nom_colonnes = ['REG_CITY_NOT_WORK_CITY', 'REGION_RATING_CLIENT', 'DAYS_ID_PUBLISH',
+                     'Age', 'SEXE', 'REG_CITY_NOT_LIVE_CITY', 'DAYS_LAST_PHONE_CHANGE',
+                    'EXT_SOURCE_2', 'YEARS_EMPLOYED', 'EXT_SOURCE_3']
+
+#    nom_colonnes = ['DAYS_ID_PUBLISH',
+#                            'Age',
+#                            'EXT_SOURCE_2', 'YEARS_EMPLOYED', 'EXT_SOURCE_3']
+
+    column_sel = nom_colonnes[0]
+    nom_colonnes = pd.Series(nom_colonnes)
+
+    column_sel = st.sidebar.selectbox('Sélectionnez la variable :', options=nom_colonnes)
+    # les donnes des clients du dataset de cette colonne
+
+    response4 = requests.get(f"{loc_aws}/col_choix/" + str(column_sel), verify=False)
+    response2 = requests.get(f"{loc_aws}/client2/" + str(client_id), verify=False)
+
+#    val_cli = None
+    if response2.status_code == 200:
+        X_test2 = response2.json()["data"]
+        X_test2 = pd.DataFrame(X_test2)
+        X_test2 = X_test2.replace('?', np.nan)
+        X_test2['CODE_GENDER'] = X_test2['CODE_GENDER'].apply(lambda x: 1 if x == 'F' else 0)
+        X_test2 = X_test2.rename(columns={'DAYS_BIRTH': 'Age', 'DAYS_EMPLOYED': 'YEARS_EMPLOYED',
+                                                'CODE_GENDER': 'SEXE'})
+
+        if np.isnan(X_test2[column_sel]).any():
+            data_col = response4.json()["data3"]
+            data_col = pd.DataFrame(data_col)
+            data_col = data_col.replace('?', np.nan)
+            # Display the figure
+            st.subheader("Histogramme de tous les clients de test :")
+            fig = px.histogram(data_col, x=column_sel)
+            fig.write_html("test.html")
+            selected_points = plotly_events(fig)
+            st.write(selected_points)
+
+        else:
+            val_cli = round(X_test2[column_sel].values[0], 1)
+            data_col = response4.json()["data3"]
+            data_col = pd.DataFrame(data_col)
+            data_col = data_col.replace('?', np.nan)
+            # Display the figure
+            st.subheader("Position du client par rapport aux autres :")
+            fig = px.histogram(data_col, x=column_sel)
+            fig.add_vline(x=val_cli, line_width=3, line_dash="dash", line_color="green")
+            fig.write_html("test.html")
+            selected_points = plotly_events(fig)
+            st.write(selected_points)
+
+    else :
+        data_col = response4.json()["data3"]
+        data_col = pd.DataFrame(data_col)
+        data_col = data_col.replace('?', np.nan)
+        # Display the figure
+        st.subheader("Histogramme de tous les clients de test :")
+        fig = px.histogram(data_col, x=column_sel)
+        fig.write_html("test.html")
+        selected_points = plotly_events(fig)
+        st.write(selected_points)
 
 if __name__ == '__main__':
     # by default it will run at 8501 port

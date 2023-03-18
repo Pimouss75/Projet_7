@@ -16,6 +16,7 @@ app = FastAPI(title='Admissibilité à un prêt', version='1.0',
 # Chargement des fichiers d'artefacts de modèle au lancement du serveur FastAPI
 model = joblib.load("model.pkl")
 df = pd.read_csv("df_test.csv")
+df['TARGET'] = model.predict(df.drop(['TARGET', 'SK_ID_CURR'], axis=1))
 
 
 # Définition d'une classe Pydantic pour valider la requête
@@ -77,9 +78,10 @@ def get_client(client_id: str) :
     df.SK_ID_CURR = df.SK_ID_CURR.astype('str')
     client_id = str(client_id)
     data = df[df["SK_ID_CURR"] == client_id].drop(['TARGET', 'SK_ID_CURR'], axis=1)
-#    data[data.select_dtypes(include=['float']).columns] = data.select_dtypes(include=['float']).astype('float32')
     data['CODE_GENDER'] = data['CODE_GENDER'].astype(int)
     data['CODE_GENDER'] = data['CODE_GENDER'].apply(lambda x: 'F' if x == 1 else 'M')
+    data['DAYS_BIRTH'] = round(-data['DAYS_BIRTH'] / 365, 1)
+    data['DAYS_EMPLOYED'] = round(-data['DAYS_EMPLOYED'] / 365, 1)
 
     if len(data) == 0:
         raise HTTPException(status_code=404, detail=f"Client {client_id} non référencé.")
@@ -88,6 +90,7 @@ def get_client(client_id: str) :
         data = data.to_dict(orient="records")
 
         return {"data": data}
+
 
 # Point de terminaison pour obtenir les données relatives a tous les clients test
 @app.get("/all_X_test")
@@ -100,6 +103,21 @@ def all_X_test() :
     data2 = data3.to_dict(orient="records")
     del data3
     return {"data2": data2}
+
+
+@app.get("/col_choix/{column_sel}")
+def col_choix(column_sel: str) :
+    df1 = df.copy()
+    df1['DAYS_BIRTH'] = round(-df1['DAYS_BIRTH'] / 365, 1)
+    df1['DAYS_EMPLOYED'] = round(-df1['DAYS_EMPLOYED'] / 365, 1)
+    df1['CODE_GENDER'] = df1['CODE_GENDER'].astype(int)
+#    df1['CODE_GENDER'] = df1['CODE_GENDER'].apply(lambda x: 'F' if x == 1 else 'M')
+    df1 = df1.rename(columns={'DAYS_BIRTH': 'Age', 'DAYS_EMPLOYED': 'YEARS_EMPLOYED', 'CODE_GENDER': 'SEXE'})
+    data1 = df1[[column_sel, 'TARGET']].copy()
+    data1 = data1.fillna('?')
+    data3 = data1.to_dict(orient="records")
+    return {"data3": data3}
+
 
 if __name__ == '__main__':
     uvicorn.run("main:app", host="localhost", port=80, reload=True)
